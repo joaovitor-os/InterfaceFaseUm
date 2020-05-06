@@ -30,11 +30,15 @@ namespace InterfaceFaseUm
         Label lb_CPF;
         Label lb_Diasdev;
 
-        TextBox txNome;
-        TextBox txDtnasc;
-        TextBox txCPF;
+        RichTextBox txtNome;
+
+        TextBox txtDtnasc;
+
+        MaskedTextBox txtCPF;
 
         ComboBox cbDiasdev;
+
+        NumericUpDown numDiasDev;
 
         CheckBox chbAtivo;
 
@@ -43,6 +47,10 @@ namespace InterfaceFaseUm
 
         Button btnConfirmar;
         Button btnCancelar;
+
+        PictureBox pbImagem;
+
+        LinkLabel linkHelp;
 
         public Form1()
         {
@@ -67,17 +75,18 @@ namespace InterfaceFaseUm
             lb_Diasdev.AutoSize = true;
             lb_Diasdev.Location = new Point(20, 140);
 
-            txNome = new TextBox();
-            txNome.Location = new Point(180, 20);
-            txNome.Size = new Size(220, 18);
+            txtNome = new RichTextBox();
+            txtNome.Location = new Point(180, 20);
+            txtNome.Size = new Size(220, 18);
 
-            txDtnasc = new TextBox();
-            txDtnasc.Location = new Point(180, 60);
-            txDtnasc.Size = new Size(100, 18);
+            txtDtnasc = new TextBox();
+            txtDtnasc.Location = new Point(180, 60);
+            txtDtnasc.Size = new Size(100, 18);
 
-            txCPF = new TextBox();
-            txCPF.Location = new Point(180, 100);
-            txCPF.Size = new Size(100, 18);
+            txtCPF = new MaskedTextBox();
+            txtCPF.Location = new Point(180, 100);
+            txtCPF.Size = new Size(100, 18);
+            txtCPF.Mask = "000,000,000-00";
 
             cbDiasdev = new ComboBox();
             cbDiasdev.Items.Add("5");
@@ -99,6 +108,14 @@ namespace InterfaceFaseUm
             cbDiasdev.Location = new Point(180, 140);
             cbDiasdev.Size = new Size(100, 18);
             */
+
+            numDiasDev = new NumericUpDown();
+            numDiasDev.Location = new Point(280, 140);
+            numDiasDev.Size = new Size(110, 18);
+            numDiasDev.Maximum = 20;
+            numDiasDev.Minimum = 5;
+            numDiasDev.Increment = 5;
+            numDiasDev.Enabled = false;
 
             chbAtivo = new CheckBox();
             chbAtivo.Location = new Point(180, 180);
@@ -127,20 +144,42 @@ namespace InterfaceFaseUm
             btnCancelar.Location = new Point(300, 260);
             btnCancelar.Click += new EventHandler(this.btnCancelarClick);
 
+            pbImagem = new PictureBox();
+            pbImagem.Size = new Size(100, 100);
+            pbImagem.Location = new Point(50, 320);
+            pbImagem.ClientSize = new Size(100, 100); 
+            pbImagem.Load("icon.png");
+
+            linkHelp = new LinkLabel();
+            linkHelp.Location = new Point(50, 200);
+            linkHelp.Size = new Size(100,30);
+            linkHelp.Text = "Ajuda";
+            linkHelp.LinkClicked += new LinkLabelLinkClickedEventHandler(helpLink);
+
             this.Controls.Add(lb_nome);
             this.Controls.Add(lb_Dtnasc);
             this.Controls.Add(lb_CPF);
             this.Controls.Add(lb_Diasdev);
-            this.Controls.Add(txNome);
-            this.Controls.Add(txDtnasc);
-            this.Controls.Add(txCPF);
+            this.Controls.Add(txtNome);
+            this.Controls.Add(txtDtnasc);
+            this.Controls.Add(txtCPF);
             this.Controls.Add(cbDiasdev);
+            this.Controls.Add(numDiasDev);
             this.Controls.Add(chbAtivo);
             this.Controls.Add(rbSexoMasc);
             this.Controls.Add(rbSexoFem);
             this.Controls.Add(btnConfirmar);
             this.Controls.Add(btnCancelar);
+            this.Controls.Add(pbImagem);
+            this.Controls.Add(linkHelp);
             this.Size = new Size(450,400);
+        }
+
+        private void helpLink(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            this.linkHelp.LinkVisited = true;
+
+            System.Diagnostics.Process.Start("IExplore.exe", "www.google.com");
         }
         
         private void btnConfirmarClick(object sender, EventArgs e)
