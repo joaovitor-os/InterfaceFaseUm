@@ -52,6 +52,12 @@ namespace InterfaceFaseUm
 
         LinkLabel linkHelp;
 
+        //ListBox listBox;
+
+        ListView listView;
+
+        //CheckedListBox checkedList;
+
         public Form1()
         {
             this.Text = "Título da Janela";
@@ -151,10 +157,56 @@ namespace InterfaceFaseUm
             pbImagem.Load("icon.png");
 
             linkHelp = new LinkLabel();
-            linkHelp.Location = new Point(50, 200);
+            linkHelp.Location = new Point(50, 300);
             linkHelp.Size = new Size(100,30);
             linkHelp.Text = "Ajuda";
             linkHelp.LinkClicked += new LinkLabelLinkClickedEventHandler(helpLink);
+
+            /*
+            listBox = new ListBox();
+            listBox.Items.Add("Kill Bill");
+            listBox.Items.Add("Rei Leão");
+            listBox.Items.Add("Coringa");
+            listBox.Location = new Point(15, 180);
+            listBox.Size = new Size(100, 100);
+            //listBox.SelectionMode = SeletionMode.MultiExtended;
+            //listBox.MultiColumn = true;
+            //listBox.EndUpdate();
+            //foreach(var element in listBox.SelectedItems)
+                Console.Write(element);
+            */
+
+            listView = new ListView();
+            listView.Location = new Point(15, 180);
+            listView.Size = new Size(150, 100);
+            listView.View = View.Details;
+            ListViewItem filme1 = new ListViewItem("Kill Bill");
+            filme1.SubItems.Add("3");
+            filme1.SubItems.Add("2001");
+            ListViewItem filme2 = new ListViewItem("Rei Leão");
+            filme2.SubItems.Add("2");
+            filme2.SubItems.Add("1994");
+            ListViewItem filme3 = new ListViewItem("Coringa");
+            filme3.SubItems.Add("1");
+            filme3.SubItems.Add("2019");
+            listView.Items.AddRange(new ListViewItem[]{filme1, filme2, filme3});
+            listView.Columns.Add("Nome", -2, HorizontalAlignment.Left);
+            listView.Columns.Add("Estoque", -2, HorizontalAlignment.Left);
+            listView.FullRowSelect = true;
+            listView.GridLines = true;
+            listView.AllowColumnReorder = true;
+            listView.Sorting = SortOrder.Ascending;
+
+            /*
+            checkedList = new CheckedListBox();
+            checkedList.Location = new Point(15, 180);
+            checkedList.Size = new Size(150, 100);
+            string[] filmes = { "Kill Bill", "Rei Leão", "Coringa" };
+            checkedList.Items.AddRange(filmes);
+            //checkedList.SelectionMode = SelectionMode.One
+            //checkedList.CheckOnClick = true;
+            //checkedList.CheckedItems;
+            */
 
             this.Controls.Add(lb_nome);
             this.Controls.Add(lb_Dtnasc);
@@ -172,6 +224,9 @@ namespace InterfaceFaseUm
             this.Controls.Add(btnCancelar);
             this.Controls.Add(pbImagem);
             this.Controls.Add(linkHelp);
+            //this.Controls.Add(listBox);
+            this.Controls.Add(listView);
+            //this.Controls.Add(checkedList);
             this.Size = new Size(450,400);
         }
 
@@ -179,7 +234,7 @@ namespace InterfaceFaseUm
         {
             this.linkHelp.LinkVisited = true;
 
-            System.Diagnostics.Process.Start("IExplore.exe", "www.google.com");
+            System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe");
         }
         
         private void btnConfirmarClick(object sender, EventArgs e)
