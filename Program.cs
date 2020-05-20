@@ -58,6 +58,12 @@ namespace InterfaceFaseUm
 
         //CheckedListBox checkedList;
 
+        MonthCalendar mcCalendar;
+
+        DateTimePicker dtPicker;
+
+        ProgressBar pbTest;
+
         public Form1()
         {
             this.Text = "Título da Janela";
@@ -208,6 +214,28 @@ namespace InterfaceFaseUm
             //checkedList.CheckedItems;
             */
 
+            mcCalendar = new MonthCalendar();
+            mcCalendar.Location = new Point(400, 15);
+            //mcCalendar.MaxSelectionCount = 4;
+            //mcCalendar.MinDate = new DateTime(2019,05,10);
+            //mcCalendar.MaxDate = new DateTime(2020,12,31);
+            //mcCalendar.SelectionRange = new SelectionRange(new DateTime (2020,05,16), new DateTime(2020,05,19));
+
+            dtPicker = new DateTimePicker();
+            dtPicker.Location = new Point(675, 15);
+            dtPicker.Size = new Size(300, 15);
+            //dtPicker.Format = DateTimePickerFormat.Time;
+            //dtPicker.Format = DateTimePickerFormat.Custom;
+            //dtPicker.CustomFormat = "dd/MM/yyyy HH:mm";
+            //dtPicker.ShowCheckBox = true;
+            //dtPicker.ShowUpDown = true;
+
+            pbTest = new ProgressBar();
+            pbTest.Location = new Point(400, 200);
+            //pbTest.Value = 50;
+            //pbTest.Style = ProgressBarStyle.Marquee;
+            //pbTest.MarqueeAnimationSpeed = 30;
+
             this.Controls.Add(lb_nome);
             this.Controls.Add(lb_Dtnasc);
             this.Controls.Add(lb_CPF);
@@ -227,7 +255,10 @@ namespace InterfaceFaseUm
             //this.Controls.Add(listBox);
             this.Controls.Add(listView);
             //this.Controls.Add(checkedList);
-            this.Size = new Size(450,400);
+            this.Controls.Add(mcCalendar);
+            this.Controls.Add(dtPicker);
+            this.Controls.Add(pbTest);
+            this.Size = new Size(1000,450);
         }
 
         private void helpLink(object sender, LinkLabelLinkClickedEventArgs e)
