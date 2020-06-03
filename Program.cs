@@ -1,9 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Drawing;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading;
+using System.IO;
 
 namespace InterfaceFaseUm
 {
@@ -24,6 +27,11 @@ namespace InterfaceFaseUm
 
     public class Form1 : Form
     {
+        TabControl tabControl;
+        TabPage tabPagePrincipal;
+        TabPage tabPageSecundario;
+
+        ToolTip toolTipNome = new ToolTip();
 
         Label lb_nome;
         Label lb_Dtnasc;
@@ -45,14 +53,17 @@ namespace InterfaceFaseUm
         RadioButton rbSexoMasc;
         RadioButton rbSexoFem;
 
+        GroupBox gpSexo;
+
         Button btnConfirmar;
         Button btnCancelar;
+        Button btnOpenFile;
 
         PictureBox pbImagem;
 
         LinkLabel linkHelp;
 
-        //ListBox listBox;
+        ListBox listBox;
 
         ListView listView;
 
@@ -64,10 +75,27 @@ namespace InterfaceFaseUm
 
         ProgressBar pbTest;
 
+        TrackBar track;
+        TextBox textBox1;
+
         public Form1()
         {
             this.Text = "Título da Janela";
             this.BackColor = Color.Azure;
+
+            tabPagePrincipal = new TabPage();
+            tabPagePrincipal.Text = "Principal";
+            tabPagePrincipal.Size = new Size(900, 550);
+
+            tabPageSecundario = new TabPage();
+            tabPageSecundario.Text = "Secundário";
+            tabPageSecundario.Size = new Size(900, 550);
+
+            tabControl = new TabControl();
+            tabControl.Location = new Point(0, 35);
+            tabControl.Size = new Size(900, 550);
+            tabControl.Controls.Add(tabPagePrincipal);
+            tabControl.Controls.Add(tabPageSecundario);
 
             lb_nome = new Label();
             lb_nome.Text = "Nome: ";
@@ -90,6 +118,12 @@ namespace InterfaceFaseUm
             txtNome = new RichTextBox();
             txtNome.Location = new Point(180, 20);
             txtNome.Size = new Size(220, 18);
+
+            toolTipNome.AutoPopDelay = 5000;
+            toolTipNome.InitialDelay = 1000;
+            toolTipNome.ReshowDelay = 500;
+            toolTipNome.ShowAlways = true;
+            toolTipNome.SetToolTip(txtNome, "Informe o nome");
 
             txtDtnasc = new TextBox();
             txtDtnasc.Location = new Point(180, 60);
@@ -131,18 +165,26 @@ namespace InterfaceFaseUm
 
             chbAtivo = new CheckBox();
             chbAtivo.Location = new Point(180, 180);
-            chbAtivo.Size = new Size(100,18);
+            chbAtivo.Size = new Size(100, 18);
             chbAtivo.Text = "Ativo?";
 
-            rbSexoMasc = new RadioButton();
-            rbSexoMasc.Location = new Point(180,220);
-            rbSexoMasc.Size = new Size(100,18);
-            rbSexoMasc.Text = "Masculino";
+            gpSexo = new GroupBox();
+			gpSexo.Location = new Point(180,220);
+			gpSexo.Size = new Size(200,40);
+			gpSexo.Text = "Sexo";
 
-            rbSexoFem = new RadioButton();
-            rbSexoFem.Location = new Point(300,220);
-            rbSexoFem.Size = new Size(100,18);
-            rbSexoFem.Text = "Feminino";
+			rbSexoMasc = new RadioButton();
+			rbSexoMasc.Location = new Point(15,15);
+			rbSexoMasc.Size = new Size(100,18);
+			rbSexoMasc.Text = "Masculino";
+
+			rbSexoFem = new RadioButton();
+			rbSexoFem.Location = new Point(120,15);
+			rbSexoFem.Size = new Size(70,18);
+			rbSexoFem.Text = "Feminino";
+
+			gpSexo.Controls.Add(rbSexoMasc);
+			gpSexo.Controls.Add(rbSexoFem);
 
             btnConfirmar = new Button();
             btnConfirmar.Text = "Confirmar";
@@ -156,19 +198,24 @@ namespace InterfaceFaseUm
             btnCancelar.Location = new Point(300, 260);
             btnCancelar.Click += new EventHandler(this.btnCancelarClick);
 
+            btnOpenFile = new Button();
+            btnOpenFile.Text = "Open File";
+            btnOpenFile.Size = new Size(100, 30);
+            btnOpenFile.Location = new Point(280, 360);
+            btnOpenFile.Click += new EventHandler(this.btnOpenFileClick);
+
             pbImagem = new PictureBox();
             pbImagem.Size = new Size(100, 100);
             pbImagem.Location = new Point(50, 320);
-            pbImagem.ClientSize = new Size(100, 100); 
+            pbImagem.ClientSize = new Size(100, 100);
             pbImagem.Load("icon.png");
 
             linkHelp = new LinkLabel();
             linkHelp.Location = new Point(50, 300);
-            linkHelp.Size = new Size(100,30);
+            linkHelp.Size = new Size(100, 30);
             linkHelp.Text = "Ajuda";
             linkHelp.LinkClicked += new LinkLabelLinkClickedEventHandler(helpLink);
 
-            /*
             listBox = new ListBox();
             listBox.Items.Add("Kill Bill");
             listBox.Items.Add("Rei Leão");
@@ -178,9 +225,6 @@ namespace InterfaceFaseUm
             //listBox.SelectionMode = SeletionMode.MultiExtended;
             //listBox.MultiColumn = true;
             //listBox.EndUpdate();
-            //foreach(var element in listBox.SelectedItems)
-                Console.Write(element);
-            */
 
             listView = new ListView();
             listView.Location = new Point(15, 180);
@@ -195,7 +239,7 @@ namespace InterfaceFaseUm
             ListViewItem filme3 = new ListViewItem("Coringa");
             filme3.SubItems.Add("1");
             filme3.SubItems.Add("2019");
-            listView.Items.AddRange(new ListViewItem[]{filme1, filme2, filme3});
+            listView.Items.AddRange(new ListViewItem[] { filme1, filme2, filme3 });
             listView.Columns.Add("Nome", -2, HorizontalAlignment.Left);
             listView.Columns.Add("Estoque", -2, HorizontalAlignment.Left);
             listView.FullRowSelect = true;
@@ -236,29 +280,126 @@ namespace InterfaceFaseUm
             //pbTest.Style = ProgressBarStyle.Marquee;
             //pbTest.MarqueeAnimationSpeed = 30;
 
-            this.Controls.Add(lb_nome);
-            this.Controls.Add(lb_Dtnasc);
-            this.Controls.Add(lb_CPF);
-            this.Controls.Add(lb_Diasdev);
-            this.Controls.Add(txtNome);
-            this.Controls.Add(txtDtnasc);
-            this.Controls.Add(txtCPF);
-            this.Controls.Add(cbDiasdev);
-            this.Controls.Add(numDiasDev);
-            this.Controls.Add(chbAtivo);
-            this.Controls.Add(rbSexoMasc);
-            this.Controls.Add(rbSexoFem);
-            this.Controls.Add(btnConfirmar);
-            this.Controls.Add(btnCancelar);
-            this.Controls.Add(pbImagem);
-            this.Controls.Add(linkHelp);
-            //this.Controls.Add(listBox);
-            this.Controls.Add(listView);
-            //this.Controls.Add(checkedList);
-            this.Controls.Add(mcCalendar);
-            this.Controls.Add(dtPicker);
-            this.Controls.Add(pbTest);
-            this.Size = new Size(1000,450);
+            track = new TrackBar();
+            track.Location = new System.Drawing.Point(8, 8);
+            track.Size = new System.Drawing.Size(224, 45);
+            track.Maximum = 30;
+            track.TickFrequency = 5;
+            track.LargeChange = 5;
+            track.SmallChange = 5;
+            track.Scroll += new EventHandler(track_Scroll);
+
+            textBox1 = new TextBox();
+            textBox1.Location = new System.Drawing.Point(300, 300);
+
+            // Create ToolStripPanel controls.
+            /*ToolStripPanel tspTop = new ToolStripPanel();
+            ToolStripPanel tspBottom = new ToolStripPanel();
+            ToolStripPanel tspLeft = new ToolStripPanel();
+            ToolStripPanel tspRight = new ToolStripPanel();
+            // Dock the ToolStripPanel controls to the edges of the form.
+            tspTop.Dock = DockStyle.Top;
+            tspBottom.Dock = DockStyle.Bottom;
+            tspLeft.Dock = DockStyle.Left;
+            tspRight.Dock = DockStyle.Right;
+            // Create ToolStrip controls to move among the 
+            // ToolStripPanel controls.
+            // Create the "Top" ToolStrip control and add
+            // to the corresponding ToolStripPanel.
+            ToolStrip tsTop = new ToolStrip();
+            tsTop.Items.Add("Top");
+            tsTop.Items.Add("Novo Item");
+            tspTop.Join(tsTop);
+            // Create the "Bottom" ToolStrip control and add
+            // to the corresponding ToolStripPanel.
+            ToolStrip tsBottom = new ToolStrip();
+            tsBottom.Items.Add("Bottom");
+            tspBottom.Join(tsBottom);
+            // Create the "Right" ToolStrip control and add
+            // to the corresponding ToolStripPanel.
+            ToolStrip tsRight = new ToolStrip();
+            tsRight.Items.Add("Right");
+            tspRight.Join(tsRight);
+            // Create the "Left" ToolStrip control and add
+            // to the corresponding ToolStripPanel.
+            ToolStrip tsLeft = new ToolStrip();
+            tsLeft.Items.Add("Left");
+            tspLeft.Join(tsLeft);*/
+
+            // Create a MenuStrip control with a new window.
+            MenuStrip ms = new MenuStrip();
+            ToolStripMenuItem windowMenu = new ToolStripMenuItem("Window");
+            ToolStripMenuItem windowNewMenu = new ToolStripMenuItem("New", null, new EventHandler(windowNewMenu_Click));
+            ToolStripMenuItem windowSaveMenu = new ToolStripMenuItem("Save");
+            windowSaveMenu.Click += new EventHandler(windowsSaveMenu_Click);
+            windowMenu.DropDownItems.Add(windowNewMenu);
+            windowMenu.DropDownItems.Add(windowSaveMenu);
+            ((ToolStripDropDownMenu)(windowMenu.DropDown)).ShowImageMargin = false;
+            ((ToolStripDropDownMenu)(windowMenu.DropDown)).ShowCheckMargin = true;
+
+            // Assign the ToolStripMenuItem that displays 
+            // the list of child forms.
+            ms.MdiWindowListItem = windowMenu;
+
+            // Add the window ToolStripMenuItem to the MenuStrip.
+            ms.Items.Add(windowMenu);
+
+            // Dock the MenuStrip to the top of the form.
+            ms.Dock = DockStyle.Top;
+
+            // The Form.MainMenuStrip property determines the merge target.
+            this.MainMenuStrip = ms;
+
+            // Add the ToolStripPanels to the form in reverse order.
+            /*this.Controls.Add(tspRight);
+            this.Controls.Add(tspLeft);
+            this.Controls.Add(tspBottom);
+            this.Controls.Add(tspTop);*/
+
+            // Add the MenuStrip last.
+            // This is important for correct placement in the z-order.
+            this.Controls.Add(ms);
+
+            tabPageSecundario.Controls.Add(track);
+            tabPageSecundario.Controls.Add(textBox1);
+
+            tabPagePrincipal.Controls.Add(lb_nome);
+            tabPagePrincipal.Controls.Add(lb_Dtnasc);
+            tabPagePrincipal.Controls.Add(lb_CPF);
+            tabPagePrincipal.Controls.Add(lb_Diasdev);
+            tabPagePrincipal.Controls.Add(txtNome);
+            tabPagePrincipal.Controls.Add(txtDtnasc);
+            tabPagePrincipal.Controls.Add(txtCPF);
+            tabPagePrincipal.Controls.Add(cbDiasdev);
+            tabPagePrincipal.Controls.Add(numDiasDev);
+            tabPagePrincipal.Controls.Add(chbAtivo);
+            tabPagePrincipal.Controls.Add(gpSexo);
+            tabPagePrincipal.Controls.Add(btnConfirmar);
+            tabPagePrincipal.Controls.Add(btnCancelar);
+            tabPagePrincipal.Controls.Add(btnOpenFile);
+            tabPagePrincipal.Controls.Add(pbImagem);
+            tabPagePrincipal.Controls.Add(linkHelp);
+            //tabPagePrincipal.Controls.Add(listBox);
+            tabPagePrincipal.Controls.Add(listView);
+            //tabPagePrincipal.Controls.Add(checkedList);
+            tabPagePrincipal.Controls.Add(mcCalendar);
+            tabPagePrincipal.Controls.Add(dtPicker);
+            tabPagePrincipal.Controls.Add(pbTest);
+            this.Controls.Add(tabControl);
+            this.Size = new Size(1000, 450);
+        }
+
+        private void windowNewMenu_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("New!!!!");
+        }
+        private void windowsSaveMenu_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Save!!!!");
+        }
+        private void track_Scroll(object sender, EventArgs e)
+        { // Display the trackbar value in the text box. 
+            textBox1.Text = "" + track.Value;
         }
 
         private void helpLink(object sender, LinkLabelLinkClickedEventArgs e)
@@ -267,25 +408,71 @@ namespace InterfaceFaseUm
 
             System.Diagnostics.Process.Start("C:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe");
         }
-        
+
         private void btnConfirmarClick(object sender, EventArgs e)
         {
-            Form formulario2 = new Form();
-            formulario2.Size = new Size(200,200);
-            formulario2.Show();
-            /*MessageBox.Show(
-                $"Nome: {txNome.Text}\n" +
-                $"Data Nasci: {txDtnasc.Text}\n" +
-                $"C.P.F: {txCPF.Text}\n" +
-                $"Dias Dev: {cbDiasdev.Text}\n",
+            string nomeFilmes = "";
+
+            for (int i = 0; i < 100; i++)
+            {
+                Thread.Sleep(500);
+                pbTest.PerformStep();
+            }
+
+            string sexo = "Indefinido";
+            foreach (var controle in this.gpSexo.Controls)
+            {
+                RadioButton radio = controle as RadioButton;
+
+                if (radio != null && radio.Checked)
+                {
+                    sexo = radio.Text;
+                }
+            }
+
+            foreach (var element in listBox.SelectedItems)
+                nomeFilmes += element;
+
+            MessageBox.Show(
+                $"Nome.: {this.txtNome.Text}\n" +
+                $"Data Nasc.: {this.txtDtnasc.Text}\n" +
+                $"C.P.F.: {this.txtCPF.Text}\n" +
+                $"Dias Dev.: {this.cbDiasdev.Text}" +
+                $"Ativo.: {(this.chbAtivo.Checked ? "Ativo" : "Inativo")}\n" +
+                $"Sexo.: {(this.rbSexoMasc.Checked ? "Masculino" : this.rbSexoFem.Checked ? "Feminino" : "Indefinido")}\n" +
+                $"Sexo.: { sexo }\n" +
+                $"Filmes.: { nomeFilmes }\n" +
+                $"Calendário Inicial: {this.mcCalendar.SelectionRange.Start}\n" +
+                $"Calendário Final: {this.mcCalendar.SelectionRange.End}\n" +
+                $"Picker.: {this.dtPicker.Value}",
                 "Cliente",
                 MessageBoxButtons.OK
-            );*/
+            );
+
+            //pbTest.PerformStep();
         }
+
 
         private void btnCancelarClick(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void btnOpenFileClick(object sender, EventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            //dialog.InitialDirectory = @"C:\";
+            //dialog.Multiselect = true;
+            dialog.Title = "Selecionar arquivos...";
+            dialog.Filter = "Arquivo de Texto (*.TXT; *.RTF) |abrirarquivo.txt";
+            if (dialog.ShowDialog() != DialogResult.Cancel)
+            {
+                StreamReader arquivo = new StreamReader(dialog.FileName);
+                string conteudo = arquivo.ReadLine();
+                arquivo.Dispose();
+
+                MessageBox.Show(conteudo);
+            }
         }
     }
 }
